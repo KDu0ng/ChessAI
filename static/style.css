@@ -1,0 +1,28 @@
+body {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background: #eee;
+}
+.chessboard {
+    border: 2px solid #333;
+}
+.row {
+    display: flex;
+}
+.square {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    user-select: none;
+    font-family: monospace, monospace;
+}
+.white {
+    background: #f0d9b5; 
+}
+.black {
+    background: #b58863;
+}
