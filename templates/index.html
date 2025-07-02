@@ -1,100 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ChessAI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>Chess Board</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="chessboard">
-        <div class="row">
-            <div class="square white">a8</div>
-            <div class="square black">b8</div>
-            <div class="square white">c8</div>
-            <div class="square black">d8</div>
-            <div class="square white">e8</div>
-            <div class="square black">f8</div>
-            <div class="square white">g8</div>
-            <div class="square black">h8</div>
-        </div>
 
+  <div id="chessboard">
+    {% for row in board %}
+        {% set row_idx = loop.index0 %}
         <div class="row">
-            <div class="square black">a7</div>
-            <div class="square white">b7</div>
-            <div class="square black">c7</div>
-            <div class="square white">d7</div>
-            <div class="square black">e7</div>
-            <div class="square white">f7</div>
-            <div class="square black">g7</div>
-            <div class="square white">h7</div>
+            {% for piece in row %}
+            {% set col_idx = loop.index0 %}
+            <div class="square {% if (row_idx + col_idx) % 2 == 0 %}white{% else %}black{% endif %}">
+                {% if piece != '' %}
+                <img src="{{ url_for('static', filename='images/' + piece + '.png') }}" width="60" />
+                {% else %}
+                &nbsp;
+                {% endif %}
+            </div>
+            {% endfor %}
         </div>
+    {% endfor %}
+  </div>
 
-        <div class="row">
-            <div class="square white">a6</div>
-            <div class="square black">b6</div>
-            <div class="square white">c6</div>
-            <div class="square black">d6</div>
-            <div class="square white">e6</div>
-            <div class="square black">f6</div>
-            <div class="square white">g6</div>
-            <div class="square black">h6</div>
-        </div>
+  <button id="moveBtn">Make Move</button>
 
-        <div class="row">
-            <div class="square black">a5</div>
-            <div class="square white">b5</div>
-            <div class="square black">c5</div>
-            <div class="square white">d5</div>
-            <div class="square black">e5</div>
-            <div class="square white">f5</div>
-            <div class="square black">g5</div>
-            <div class="square white">h5</div>
-        </div>
+  <script>
+    function renderBoard(board) {
+      const chessboard = document.getElementById('chessboard');
+      chessboard.innerHTML = '';  // clear
 
-        <div class="row">
-            <div class="square white">a4</div>
-            <div class="square black">b4</div>
-            <div class="square white">c4</div>
-            <div class="square black">d4</div>
-            <div class="square white">e4</div>
-            <div class="square black">f4</div>
-            <div class="square white">g4</div>
-            <div class="square black">h4</div>
-        </div>
+      for (let r = 0; r < 8; r++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.classList.add('row');
 
-        <div class="row">
-            <div class="square black">a3</div>
-            <div class="square white">b3</div>
-            <div class="square black">c3</div>
-            <div class="square white">d3</div>
-            <div class="square black">e3</div>
-            <div class="square white">f3</div>
-            <div class="square black">g3</div>
-            <div class="square white">h3</div>
-        </div>
+        for (let c = 0; c < 8; c++) {
+          const squareDiv = document.createElement('div');
+          squareDiv.classList.add('square');
+          if ((r + c) % 2 === 0) {
+            squareDiv.classList.add('white');
+          } else {
+            squareDiv.classList.add('black');
+          }
 
-        <div class="row">
-            <div class="square white">a2</div>
-            <div class="square black">b2</div>
-            <div class="square white">c2</div>
-            <div class="square black">d2</div>
-            <div class="square white">e2</div>
-            <div class="square black">f2</div>
-            <div class="square white">g2</div>
-            <div class="square black">h2</div>
-        </div>
+          const piece = board[r][c];
+          if (piece !== '') {
+            const img = document.createElement('img');
+            img.src = `/static/images/${piece}.png`;
+            img.width = 60;
+            squareDiv.appendChild(img);
+          } else {
+            squareDiv.innerHTML = '&nbsp;';
+          }
+          rowDiv.appendChild(squareDiv);
+        }
+        chessboard.appendChild(rowDiv);
+      }
+    }
 
-        <div class="row">
-            <div class="square black">a1</div>
-            <div class="square white">b1</div>
-            <div class="square black">c1</div>
-            <div class="square white">d1</div>
-            <div class="square black">e1</div>
-            <div class="square white">f1</div>
-            <div class="square black">g1</div>
-            <div class="square white">h1</div>
-        </div>
-    </div>
+    document.getElementById('moveBtn').addEventListener('click', () => {
+      fetch('/update_board', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          renderBoard(data.board);
+        });
+    });
+  </script>
+
 </body>
 </html>
